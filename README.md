@@ -1,4 +1,4 @@
-**CoxJames - Customer Feedback Categorisation and Sentiment Analysis**
+**CoxJames - Feedback Categorisation and Sentiment Analysis**
 
 # Overview: 
 The project consists of two Python codes: `CoxJames_CategoryAnalysis.py` and `CoxJames_FeedbackCategorisation+SentimentAnalysis.py`. These codes are designed to perform category analysis and sentiment analysis on feedback data stored in Excel files.
