@@ -1,0 +1,93 @@
+import pandas as pd
+import numpy as np
+import matplotlib
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+from IPython.display import display
+import openpyxl
+import os
+
+# Get the directory path of the Python script
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+# Load the Excel file in the same directory as the Python script
+wb = openpyxl.load_workbook(os.path.join(dir_path, 'Dictionary_Output.xlsx'))
+
+# Get the "Dictionary" sheet
+ws_dictionary = wb['Dictionary']
+
+# Create a dictionary of custom categories and their associated keywords
+custom_categories = {}
+
+# Loop through the rows in the "Dictionary" sheet
+for row in ws_dictionary.iter_rows(min_row=2, values_only=True):
+    category = row[0]
+    if row[1] is None:
+        continue
+    n_grams = [n_gram.strip() for n_gram in row[1].split(",")]
+    if len(n_grams) > 0:
+        custom_categories[category] = n_grams
+
+# load the Excel file to analyse into a pandas dataframe
+df = pd.read_excel(os.path.join(dir_path, 'INSERT EXCEL FILE NAME'), sheet_name='Raw')
+
+# convert the 'Feedback' column to string type
+df['Feedback'] = df['Feedback'].astype(str)
+
+# create a function to categorise text based on n-grams
+def categorize_text(text, custom_categories):
+    if pd.isna(text):
+        return []
+    categories = []
+    for category, n_grams in custom_categories.items():
+        for n_gram in n_grams:
+            words = [word.strip() for word in n_gram.split(" ")]
+            if all(word in text.lower() for word in words):
+                if category not in categories:
+                    categories.append(category)
+    if len(categories) == 0:
+        categories.append("Z.Unknown")
+    return categories
+
+# apply the categorize_text function to the dataframe to create a new column
+df['categories'] = df['Feedback'].apply(lambda x: categorize_text(x, custom_categories))
+
+# explode the 'categories' column to get a separate row for each category
+df = df.explode('categories')
+
+# create an instance of the SentimentIntensityAnalyzer
+sid = SentimentIntensityAnalyzer()
+
+# apply the sid polarity_scores function to the dataframe to create new columns for sentiment analysis
+df['sentiment'] = df['Feedback'].apply(lambda x: sid.polarity_scores(x)['compound'])
+
+# create a pivot table to summarize the data by category
+pivot_table = df.groupby('categories').agg({'sentiment': ['count', 'mean']})
+
+# add a row for the total count and mean sentiment
+total_count = pivot_table['sentiment']['count'].sum()
+total_mean_sentiment = pivot_table['sentiment']['mean'].mean()
+pivot_table.loc['Total'] = [total_count, total_mean_sentiment]
+
+# format the pivot table
+pivot_table.columns = ['Count', 'Mean Sentiment']
+pivot_table.index.name = None
+
+# define functions to apply font colour based on value NB. Not working fully as intended
+def color_negative_red(val):
+    color = 'red' if val < 0 else 'black'
+    return f'color: {color}'
+
+def color_positive_green(val):
+    color = 'green' if val > 0 else 'black'
+    return f'color: {color}'
+
+# apply formatting to mean sentiment column
+styled_table = pivot_table.style.applymap(color_negative_red, subset=pd.IndexSlice[:, ['Mean Sentiment']]).applymap(color_positive_green, subset=pd.IndexSlice[:, ['Mean Sentiment']])
+
+# Save the file to the current directory
+output_file_path = os.path.join(dir_path, 'Category_Analysis_Output.xlsx')
+writer = pd.ExcelWriter(output_file_path)
+styled_table.to_excel(writer, sheet_name='summary')
+df.to_excel(writer, sheet_name='raw')
+writer._save()
