@@ -1,14 +1,14 @@
 **CoxJames - Customer Feedback Categorisation and Sentiment Analysis**
 
-## Overview: 
+# Overview: 
 The project consists of two Python codes: `CoxJames_CategoryAnalysis.py` and `CoxJames_FeedbackCategorisation+SentimentAnalysis.py`. These codes are designed to perform category analysis and sentiment analysis on feedback data stored in Excel files.
 
 By combining these two codes, users can analyse feedback data, extract relevant keywords, categorise feedback, and perform sentiment analysis, allowing them to gain valuable insights into the feedback received and understand the sentiment associated with different categories. These insights can be utilised for various purposes, such as improving products or services, identifying areas of improvement, and making data-driven decisions based on customer feedback.
 
-## Description of CoxJames_CategoryAnalysis_NgramGeneration:
+# Description of CoxJames_CategoryAnalysis_NgramGeneration:
 The main purpose of `CoxJames_CategoryAnalysis.py` is to analyse feedback data and extract relevant keywords for predefined category. The code reads an Excel file containing feedback and category information. It tokenises the feedback, removes stopwords, creates n-grams, and tags the tokens with part-of-speech tags. It then extracts keywords based on the assigned categories and writes them to the "Dictionary" sheet of another Excel file. This code helps in identifying significant keywords associated with each feedback category.
 
-# Usage:
+## Usage:
 1. Install the required libraries:
    ```shell
    pip install openpyxl nltk
@@ -48,10 +48,10 @@ The main purpose of `CoxJames_CategoryAnalysis.py` is to analyse feedback data a
 Note: Make sure you have appropriate permissions to read and write files in the specified directory.
 
 
-## Description of CoxJames_FeedbackCategorisation+SentimentAnalysis:
+# Description of CoxJames_FeedbackCategorisation+SentimentAnalysis:
 The main purpose of `CoxJames_FeedbackCategorisation+SentimentAnalysis.py` is to categorise feedback based on custom categories and perform sentiment analysis. It reads an Excel file containing feedback data and utilises the previously generated "Dictionary" sheet to categorise the feedback based on the extracted keywords. Additionally, the code performs sentiment analysis using the SentimentIntensityAnalyzer from the NLTK library. The results, including the assigned categories and sentiment scores, are saved in separate sheets of a new Excel file. This code enables the categorisation and sentiment analysis of feedback data, providing valuable insights into customer sentiment and feedback trends.
 
-# Usage:
+## Usage:
 1. Install the required libraries:
 
    ```shell
